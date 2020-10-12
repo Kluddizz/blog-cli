@@ -23,6 +23,22 @@ const postCommand = async (args) => {
 
 const deleteCommand = (args) => {};
 
+const updateCommand = async (args) => {
+  const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
+  const { data, content } = matter(fileContent);
+
+  const request = await fetch(`${args.host}/post/${args.slug}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...data, content }),
+  });
+
+  const response = await request.json();
+  console.log(response.message);
+};
+
 const parser = new argparse.ArgumentParser();
 const subparsers = parser.add_subparsers();
 
@@ -35,6 +51,12 @@ const deleteParser = subparsers.add_parser("delete", { help: "delete a post" });
 deleteParser.add_argument("slug");
 deleteParser.add_argument("host");
 deleteParser.set_defaults({ func: deleteCommand });
+
+const updateParser = subparsers.add_parser("update", { help: "update a post" });
+updateParser.add_argument("file");
+updateParser.add_argument("host");
+updateParser.add_argument("slug");
+updateParser.set_defaults({ func: updateCommand });
 
 const args = parser.parse_args();
 args.func(args);
