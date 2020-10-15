@@ -4,6 +4,22 @@ const path = require("path");
 const fetch = require("node-fetch");
 const argparse = require("argparse");
 const matter = require("gray-matter");
+const reader = require("readline-sync");
+
+const requestToken = async () => {
+  const username = reader.question("Username: ");
+  const password = reader.question("Password: ", { hideEchoBack: true });
+
+  const request = await fetch(`http://localhost:5003/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username: username, password: password }),
+  });
+
+  return await request.json();
+};
 
 const postCommand = async (args) => {
   const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
@@ -24,19 +40,26 @@ const postCommand = async (args) => {
 const deleteCommand = (args) => {};
 
 const updateCommand = async (args) => {
-  const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
-  const { data, content } = matter(fileContent);
+  const response = await requestToken();
 
-  const request = await fetch(`${args.host}/post/${args.slug}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...data, content }),
-  });
+  if (response.status === 200) {
+    const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
+    const { data, content } = matter(fileContent);
 
-  const response = await request.json();
-  console.log(response.message);
+    const request = await fetch(`${args.host}/post/${args.slug}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${response.token}`,
+      },
+      body: JSON.stringify({ ...data, content }),
+    });
+
+    const response = await request.json();
+    console.log(response.message);
+  } else {
+    console.log("Wrong credentials");
+  }
 };
 
 const parser = new argparse.ArgumentParser();
