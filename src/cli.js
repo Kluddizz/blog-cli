@@ -55,7 +55,7 @@ const updateCommand = async (args) => {
       body: JSON.stringify({ ...data, content }),
     });
 
-    const res = await request.json();
+    const res = await req.json();
     console.log(res.message);
   } else {
     console.log("Wrong credentials");
