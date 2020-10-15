@@ -22,31 +22,37 @@ const requestToken = async () => {
 };
 
 const postCommand = async (args) => {
-  const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
-  const { data, content } = matter(fileContent);
+  const res = await requestToken();
 
-  const request = await fetch(`${args.host}/post`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...data, content }),
-  });
+  if (res.status === 200) {
+    const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
+    const { data, content } = matter(fileContent);
 
-  const response = await request.json();
-  console.log(response.message);
+    const request = await fetch(`${args.host}/post`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...data, content }),
+    });
+
+    const response = await request.json();
+    console.log(response.message);
+  } else {
+    console.log("Wrong credentials");
+  }
 };
 
 const deleteCommand = (args) => {};
 
 const updateCommand = async (args) => {
-  const response = await requestToken();
+  const res = await requestToken();
 
-  if (response.status === 200) {
+  if (res.status === 200) {
     const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
     const { data, content } = matter(fileContent);
 
-    const req = await fetch(`${args.host}/post/${args.slug}`, {
+    const request = await fetch(`${args.host}/post/${args.slug}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -55,8 +61,8 @@ const updateCommand = async (args) => {
       body: JSON.stringify({ ...data, content }),
     });
 
-    const res = await req.json();
-    console.log(res.message);
+    const response = await request.json();
+    console.log(response.message);
   } else {
     console.log("Wrong credentials");
   }
