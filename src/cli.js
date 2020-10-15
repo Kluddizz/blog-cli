@@ -46,7 +46,7 @@ const updateCommand = async (args) => {
     const fileContent = fs.readFileSync(args.file, { encoding: "utf-8" });
     const { data, content } = matter(fileContent);
 
-    const request = await fetch(`${args.host}/post/${args.slug}`, {
+    const req = await fetch(`${args.host}/post/${args.slug}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -55,8 +55,8 @@ const updateCommand = async (args) => {
       body: JSON.stringify({ ...data, content }),
     });
 
-    const response = await request.json();
-    console.log(response.message);
+    const res = await request.json();
+    console.log(res.message);
   } else {
     console.log("Wrong credentials");
   }
