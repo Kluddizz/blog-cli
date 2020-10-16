@@ -32,6 +32,7 @@ const postCommand = async (args) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${res.token}`,
       },
       body: JSON.stringify({ ...data, content }),
     });
@@ -56,7 +57,7 @@ const updateCommand = async (args) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${response.token}`,
+        Authorization: `Bearer ${res.token}`,
       },
       body: JSON.stringify({ ...data, content }),
     });
